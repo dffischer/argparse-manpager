@@ -8,6 +8,7 @@ that composes a man page instead of a console help text.
 from argparse import HelpFormatter
 from functools import partial
 from .structure import TH, SH
+from .markup import bold, italic, listmap, FormatWrapper
 
 class ManPage(TH):
     """
@@ -55,12 +56,14 @@ class ManPageFormatter(HelpFormatter):
 
     def __init__(self, prog, *args, **kwargs):
         """Remembers the program name and initializes the sect attribute to a fresh manpage.
+
+        Further arguments will be passed to the ManPage constructor. See there for more options.
         
         This class does by far not use all of the methods and attributes
         HelpFormatter does. The ones used only need the attribute _prog set.
         Not calling more complex parent methods or its constructor completely
         avoids the far detours HelpFormatter goes to consider the line width."""
-        self._prog = prog
+        self._prog = bold(prog)
         self.sect = ManPage(prog, *args, **kwargs)
 
     def start_section(self, heading):
@@ -80,13 +83,13 @@ class ManPageFormatter(HelpFormatter):
     def add_usage(self, usage, actions, groups, prefix=None):
         """Formats the usage and appends it to the current section."""
         self.sect << self._prog \
-                << self._format_actions_usage(actions, groups)
+                << self._format_actions_usage(listmap(FormatWrapper, actions), groups)
 
     def add_arguments(self, actions):
         """Formats arguments and appends it to the current section."""
         for action in actions:
             self.sect << '.TP' \
-                    << self._format_action_invocation(action) \
+                    << self._format_action_invocation(FormatWrapper(action)) \
                     << self._expand_help(action)
 
     def format_help(self):
@@ -94,3 +97,8 @@ class ManPageFormatter(HelpFormatter):
         When the top level section is active, this returns the complete page as a string."""
         return str(self.sect)
 
+    def _get_default_metavar_for_optional(self, action):
+        return italic(super()._get_default_metavar_for_optional(action))
+
+    def _get_default_metavar_for_positional(self, action):
+        return italic(super()._get_default_metavar_for_positional(action))
