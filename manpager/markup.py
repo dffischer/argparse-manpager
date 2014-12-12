@@ -11,11 +11,13 @@ def listmap(func, list):
     """the built-in map function, returning a tuple instead of an iterable"""
     return tuple(func(element) for element in list)
 
-"""formats a span of running text bold"""
-bold = r'\fB{}\fP'.format
+def bold(text):
+    """formats a span of running text bold"""
+    return r'\fB{}\fP'.format(text)
 
-"""formats a span of running text italic"""
-italic = r'\fI{}\fP'.format
+def italic(text):
+    """formats a span of running text italic"""
+    return r'\fI{}\fP'.format(text)
 
 class OverrideWrapper(object):
     """A generic wrapper that can selectively modify attributes of the wrapped object.
@@ -42,6 +44,7 @@ class OverrideWrapper(object):
             except AttributeError:
                 return original
 
-FormatWrapper = OverrideWrapper.generate('FormatWrapper',
-        option_strings=(partial(listmap, bold)),
-        metavar=italic)
+class FormatWrapper(OverrideWrapper):
+    """Wrap an Action to format option strings bold and metavar italic."""
+    option_strings = staticmethod(partial(listmap, bold))
+    metavar = staticmethod(italic)
