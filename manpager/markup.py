@@ -6,6 +6,7 @@ to roff syntax, which is used in manual pages.
 """
 
 from functools import partial
+from re import compile
 
 def listmap(func, list):
     """the built-in map function, returning a tuple instead of an iterable"""
@@ -48,3 +49,49 @@ class FormatWrapper(OverrideWrapper):
     """Wrap an Action to format option strings bold and metavar italic."""
     option_strings = staticmethod(partial(listmap, bold))
     metavar = staticmethod(italic)
+
+
+class MultiRegexReplacer(object):
+    """Replace multiple regular expressions in one pass."""
+
+    def __init__(self, replaces):
+        """Replaces a given mapping.
+
+        Keys are regular expressions to replace, values are their replacements. These may be
+        callables which will be used to generate a replacement. Note that, other than with
+        re.sub, they will not be passed a match object, but the original match as a string.
+        Values that are not callable will be used as replacements without further modification.
+        """
+        expressions, self.replacements = zip(*replaces.items())
+        self.expression = compile('|'.join(map('({})'.format, expressions)))
+
+    def replace(self, match):
+        """Generate the replacement for a single match according
+        to the replacement directives given on initialization."""
+        for group, replacement in zip(match.groups(), self.replacements):
+            if group:
+                try:
+                    return replacement(group)
+                except TypeError:
+                    return replacement
+
+    def __call__(self, text):
+        return self.expression.sub(self.replace, text)
+
+class Sanitizer(MultiRegexReplacer):
+    """Sanitize strings for usage in manual pages.
+
+    This will trim whitespace on beginning and end, escape special characters,
+    condense whitespace and turn double newlines into proper paragraphs.
+    """
+
+    def __init__(self, paragraph=".PP"):
+        """Initialize a new Sanitizer generating the given paragraph type.
+
+        Top-level paragraphs are the default. Use ".IP" for indented sections.
+        """
+        paragraph = '\n' + paragraph + '\n'
+        super().__init__({
+            '-': '\\-',
+            '(?<!^)\s\s+(?!$)': lambda text: ' ' if text.count('\n') < 2 else paragraph,
+            '^\s+|\s+$': ''})

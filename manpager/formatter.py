@@ -8,7 +8,10 @@ that composes a man page instead of a console help text.
 from argparse import HelpFormatter
 from functools import partial
 from .structure import TH, SH
-from .markup import bold, italic, listmap, FormatWrapper
+from .markup import bold, italic, listmap, FormatWrapper, Sanitizer
+
+sanitize = Sanitizer()
+sanitize_indented = Sanitizer('.IP')
 
 class ManPage(TH):
     """
@@ -32,7 +35,7 @@ class ManPage(TH):
         options = SH('OPTIONS')
         remarks = SH('REMARKS')
         super().__init__(suite if suite else prog, name, synopsis, description, options, remarks,
-                *(SH(title) << content for title, content in extrasections.items()))
+                *(SH(title) << sanitize(content) for title, content in extrasections.items()))
         if short_desc:
             name << "\-" << short_desc
         self.options = options
@@ -78,7 +81,7 @@ class ManPageFormatter(HelpFormatter):
     def add_text(self, text):
         """Adds text element to the current section."""
         if text:
-            self.sect << text
+            self.sect << sanitize(text)
 
     def add_usage(self, usage, actions, groups, prefix=None):
         """Formats the usage and appends it to the current section."""
@@ -90,7 +93,7 @@ class ManPageFormatter(HelpFormatter):
         for action in actions:
             self.sect << '.TP' \
                     << self._format_action_invocation(FormatWrapper(action)) \
-                    << self._expand_help(action)
+                    << sanitize_indented(self._expand_help(action))
 
     def format_help(self):
         """Serializes the current section.
