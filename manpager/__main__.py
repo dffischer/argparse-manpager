@@ -27,6 +27,7 @@ del(parser)
 
 from functools import partial, partialmethod
 from .formatter import ManPageFormatter
+from collections import OrderedDict
 
 def override(cls, name, method):
     """Injects a method into a class.
@@ -56,7 +57,7 @@ def parse_known_args(self, original, argv=None, namespace=None):
 @argparser
 def _get_formatter(self, original):
     return ManPageFormatter(prog=self.prog, short_desc=args.short, suite=args.suite,
-            extrasections={match.group(1): match.group(2) for match in args.extra})
+            extrasections=OrderedDict((match.group(1), match.group(2)) for match in args.extra))
 
 
 # Execute the given module.
