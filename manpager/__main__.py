@@ -2,6 +2,7 @@
 """Generates a manual page from a module using argparse."""
 
 from argparse import ArgumentParser
+from re import compile
 
 # Do not modify ArgumentParser yet. First, it is needed proper for this program itself.
 
@@ -14,6 +15,10 @@ parser.add_argument('-d', '--short', metavar="DESCRIPTION", help="""
         construction will always end up in the DESCRIPTION section.""")
 parser.add_argument('-s', '--suite', help="""Specifies the suite to insert into the header.
         If not given, the program name will be used.""")
+parser.add_argument('-e', '--extra', help="""Add an additional section at the end of
+        the page. All words that are written in all caps at the start of the argument
+        will be used as the section title, the remainder is considered its body.""",
+        action="append", default=[], type=compile('([A-Z ]+) (.*)').match)
 args = parser.parse_args()
 del(parser)
 
@@ -50,7 +55,8 @@ def parse_known_args(self, original, argv=None, namespace=None):
 
 @argparser
 def _get_formatter(self, original):
-    return ManPageFormatter(prog=self.prog, short_desc=args.short, suite=args.suite)
+    return ManPageFormatter(prog=self.prog, short_desc=args.short, suite=args.suite,
+            extrasections={match.group(1): match.group(2) for match in args.extra})
 
 
 # Execute the given module.
