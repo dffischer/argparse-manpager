@@ -12,6 +12,8 @@ parser.add_argument('-d', '--short', metavar="DESCRIPTION", help="""
         the summary shown by apropos. When not given, this will just consist
         of the executable name. The inherent description text given at ArgumentParser
         construction will always end up in the DESCRIPTION section.""")
+parser.add_argument('-s', '--suite', help="""Specifies the suite to insert into the header.
+        If not given, the program name will be used.""")
 args = parser.parse_args()
 del(parser)
 
@@ -48,7 +50,7 @@ def parse_known_args(self, original, argv=None, namespace=None):
 
 @argparser
 def _get_formatter(self, original):
-    return ManPageFormatter(prog=self.prog, short_desc=args.short)
+    return ManPageFormatter(prog=self.prog, short_desc=args.short, suite=args.suite)
 
 
 # Execute the given module.
