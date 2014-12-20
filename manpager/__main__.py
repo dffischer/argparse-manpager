@@ -7,6 +7,11 @@ from argparse import ArgumentParser
 
 parser = ArgumentParser(description="Generates a manpage from an argparse help text")
 parser.add_argument('module', help="module to generate manpage for")
+parser.add_argument('-d', '--short', metavar="DESCRIPTION", help="""
+        Specifies a short description to add in the NAME section. This will be
+        the summary shown by apropos. When not given, this will just consist
+        of the executable name. The inherent description text given at ArgumentParser
+        construction will always end up in the DESCRIPTION section.""")
 args = parser.parse_args()
 del(parser)
 
@@ -43,7 +48,7 @@ def parse_known_args(self, original, argv=None, namespace=None):
 
 @argparser
 def _get_formatter(self, original):
-    return ManPageFormatter(prog=self.prog)
+    return ManPageFormatter(prog=self.prog, short_desc=args.short)
 
 
 # Execute the given module.
