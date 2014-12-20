@@ -5,7 +5,11 @@ from functools import partial, partialmethod
 from argparse import ArgumentParser
 from .formatter import ManPageFormatter
 from runpy import run_module
-from sys import argv
+
+parser = ArgumentParser(description="Generates a manpage from an argparse help text")
+parser.add_argument('module', help="module to generate manpage for")
+args = parser.parse_args()
+del(parser)
 
 def override(cls, name, method):
     """Injects a method into a class.
@@ -36,4 +40,5 @@ def parse_known_args(self, original, argv=None, namespace=None):
 def _get_formatter(self, original):
     return ManPageFormatter(prog=self.prog)
 
-run_module(argv[1], run_name='__main__', alter_sys=True) # alter_sys to update program name in argv[0]
+run_module(args.module, run_name='__main__',
+        alter_sys=True) # alter_sys to update program name in argv[0]
