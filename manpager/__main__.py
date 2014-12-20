@@ -1,15 +1,20 @@
 #!/usr/bin/python
 """Generates a manual page from a module using argparse."""
 
-from functools import partial, partialmethod
 from argparse import ArgumentParser
-from .formatter import ManPageFormatter
-from runpy import run_module
+
+# Do not modify ArgumentParser yet. First, it is needed proper for this program itself.
 
 parser = ArgumentParser(description="Generates a manpage from an argparse help text")
 parser.add_argument('module', help="module to generate manpage for")
 args = parser.parse_args()
 del(parser)
+
+
+# Parsing finished. Now the parser class can be patched.
+
+from functools import partial, partialmethod
+from .formatter import ManPageFormatter
 
 def override(cls, name, method):
     """Injects a method into a class.
@@ -39,6 +44,11 @@ def parse_known_args(self, original, argv=None, namespace=None):
 @argparser
 def _get_formatter(self, original):
     return ManPageFormatter(prog=self.prog)
+
+
+# Execute the given module.
+
+from runpy import run_module
 
 run_module(args.module, run_name='__main__',
         alter_sys=True) # alter_sys to update program name in argv[0]
