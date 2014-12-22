@@ -51,6 +51,8 @@ class FormatWrapper(OverrideWrapper):
     metavar = staticmethod(italic)
 
 
+from collections import OrderedDict
+
 class MultiRegexReplacer(object):
     """Replace multiple regular expressions in one pass."""
 
@@ -91,7 +93,8 @@ class Sanitizer(MultiRegexReplacer):
         Top-level paragraphs are the default. Use ".IP" for indented sections.
         """
         paragraph = '\n' + paragraph + '\n'
-        super().__init__({
-            '-': '\\-',
-            '(?<!^)\s\s+(?!$)': lambda text: ' ' if text.count('\n') < 2 else paragraph,
-            '^\s+|\s+$': ''})
+        super().__init__(OrderedDict((
+            ('-', '\\-'),
+            ('\n\n+', paragraph),
+            ('^\s+|\s+$', ''),
+            ('\s\s+', ' '))))
