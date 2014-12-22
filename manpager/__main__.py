@@ -19,7 +19,13 @@ parser.add_argument('-s', '--suite', help="""Specifies the suite to insert into 
         this will be used. If neither is present, the program name will be used.""")
 parser.add_argument('-e', '--extra', help="""Add an additional section at the end of
         the page. All words that are written in all caps at the start of the argument
-        will be used as the section title, the remainder is considered its body.""",
+        will be used as the section title, the remainder is considered its body.
+
+        If the ArgumentParser used by the module itself has an extrasections attribute as
+        well, this will be treated as a mapping from titles to contents of additional sections.
+
+        When both are present, content given as arguments will be
+        appended at the end, overwriting sections with the same name.""",
         action="append", default=[], type=compile('([A-Z ]+) (.*)').match)
 parser.add_argument('-p', '--program', help="""When the program does not
         manually set its name, the basename of the file executed will be used.
@@ -33,6 +39,7 @@ del(parser)
 from functools import partial, partialmethod
 from .formatter import ManPageFormatter
 from collections import OrderedDict
+from itertools import chain
 
 def override(cls, name, method):
     """Injects a method into a class.
@@ -64,7 +71,9 @@ def _get_formatter(self, original):
     return ManPageFormatter(prog=args.program or self.prog,
             short_desc=args.short or getattr(self, 'short', None),
             suite=args.suite or getattr(self, 'suite', None),
-            extrasections=OrderedDict((match.group(1), match.group(2)) for match in args.extra))
+            extrasections=OrderedDict(chain(
+                getattr(self, 'extrasections', {}).items(),
+                (match.groups() for match in args.extra))))
 
 
 # Execute the given module.
