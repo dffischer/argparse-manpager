@@ -6,7 +6,7 @@ to roff syntax, which is used in manual pages.
 """
 
 from functools import partial
-from re import compile
+from re import compile, MULTILINE
 
 def listmap(func, list):
     """the built-in map function, returning a tuple instead of an iterable"""
@@ -65,7 +65,7 @@ class MultiRegexReplacer(object):
         Values that are not callable will be used as replacements without further modification.
         """
         expressions, self.replacements = zip(*replaces.items())
-        self.expression = compile('|'.join(map('({})'.format, expressions)))
+        self.expression = compile('|'.join(map('({})'.format, expressions)), MULTILINE)
 
     def replace(self, match):
         """Generate the replacement for a single match according

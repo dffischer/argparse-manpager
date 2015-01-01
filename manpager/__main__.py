@@ -2,7 +2,7 @@
 """Generates a manual page from a module using argparse."""
 
 from argparse import ArgumentParser
-from re import compile
+from re import compile, DOTALL
 
 # Do not modify ArgumentParser yet. First, it is needed proper for this program itself.
 
@@ -26,7 +26,7 @@ parser.add_argument('-e', '--extra', help="""Add an additional section at the en
 
         When both are present, content given as arguments will be
         appended at the end, overwriting sections with the same name.""",
-        action="append", default=[], type=compile('([A-Z ]+) (.*)').match)
+        action="append", default=[], type=compile('([A-Z ]+) (.*)', DOTALL).match)
 parser.add_argument('-p', '--program', help="""When the program does not
         manually set its name, the basename of the file executed will be used.
         This option overrides this as well as an explicitly set name.""")
