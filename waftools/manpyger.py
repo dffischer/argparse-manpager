@@ -65,11 +65,13 @@ def generate_python_starter(self):
             module.replace(".", "-") for module in modules))):
         env = self.env.derive()
         env.MODULE = module
+        def create_task(*args, **kwargs):
+            self.create_task(*args, env = env, **kwargs)
         starter = target.change_ext('.sh')
-        self.create_task('entrypynt', tgt = starter, env = env)
+        create_task('entrypynt', tgt = starter)
         self.bld.install_as(subst_vars("${BINDIR}/", self.env) + target.name, starter, chmod=O755)
         manpage = target.change_ext('.1')
-        self.create_task('manpyge', tgt = manpage, env = env)
+        create_task('manpyge', tgt = manpage)
         compressed = target.change_ext('.1.gz')
-        self.create_task('gz', src = manpage, tgt = compressed, env = env)
+        create_task('gz', src = manpage, tgt = compressed)
         self.bld.install_files(subst_vars("${MANDIR}/man1", self.env), compressed)
