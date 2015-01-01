@@ -70,4 +70,6 @@ def generate_python_starter(self):
         self.bld.install_as(subst_vars("${BINDIR}/", self.env) + target.name, starter, chmod=O755)
         manpage = target.change_ext('.1')
         self.create_task('manpyge', tgt = manpage, env = env)
-        self.create_task('gz', src = manpage, tgt = target.change_ext('.1.gz'), env = env)
+        compressed = target.change_ext('.1.gz')
+        self.create_task('gz', src = manpage, tgt = compressed, env = env)
+        self.bld.install_files(subst_vars("${MANDIR}/man1", self.env), compressed)
