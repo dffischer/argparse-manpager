@@ -29,7 +29,8 @@ def find_py(location, module, entry="__init__"):
         return location.find_node(module + ".py")
 
 class manpyge(Task):
-    run_str = "PYTHONPATH=${gen.path.abspath()}: ${PYTHON} -Bm manpager ${MODULE} > ${TGT}"
+    run_str = "PYTHONPATH=${gen.path.abspath()}: ${PYTHON} " \
+        "-Bm manpager ${MANPAGERFLAGS} ${MODULE} > ${TGT}"
 
     def scan(self, imp=compile("^from (\..+) import .+$|^import (\..+)$", MULTILINE)):
         """find local imports recursively"""
@@ -59,19 +60,26 @@ class gz(Task):
 
 @feature('entrypynt')
 def generate_python_starter(self):
+    env = self.env
+    for parameter in 'short', 'suite', 'program':
+        value = getattr(self, parameter, None)
+        if value:
+            env.append_value("MANPAGERFLAGS", ("--" + parameter, '"' + value + '"'))
+    for title, content in getattr(self, 'extra', {}).items():
+        env.append_value("MANPAGERFLAGS", ("-e '{} {}'".format(title.upper(), content)))
     modules = to_list(self.modules)
     for module, target in zip(modules, map(self.path.find_or_declare,
         to_list(self.target) if self.target else (
             module.replace(".", "-") for module in modules))):
-        env = self.env.derive()
-        env.MODULE = module
+        modenv = env.derive()
+        modenv.MODULE = module
         def create_task(*args, **kwargs):
-            self.create_task(*args, env = env, **kwargs)
+            self.create_task(*args, env = modenv, **kwargs)
         starter = target.change_ext('.sh')
         create_task('entrypynt', tgt = starter)
-        self.bld.install_as(subst_vars("${BINDIR}/", self.env) + target.name, starter, chmod=O755)
+        self.bld.install_as(subst_vars("${BINDIR}/", env) + target.name, starter, chmod=O755)
         manpage = target.change_ext('.1')
         create_task('manpyge', tgt = manpage)
         compressed = target.change_ext('.1.gz')
         create_task('gz', src = manpage, tgt = compressed)
-        self.bld.install_files(subst_vars("${MANDIR}/man1", self.env), compressed)
+        self.bld.install_files(subst_vars("${MANDIR}/man1", env), compressed)
