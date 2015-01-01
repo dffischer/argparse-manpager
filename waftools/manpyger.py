@@ -51,6 +51,12 @@ class manpyge(Task):
     def __str__(self):
         return self.env.MODULE
 
+class gz(Task):
+    run_str = "gzip -c ${SRC} > ${TGT}"
+
+    def keyword(self):
+        return "Compressing"
+
 @feature('entrypynt')
 def generate_python_starter(self):
     modules = to_list(self.modules)
@@ -62,4 +68,6 @@ def generate_python_starter(self):
         starter = target.change_ext('.sh')
         self.create_task('entrypynt', tgt = starter, env = env)
         self.bld.install_as(subst_vars("${BINDIR}/", self.env) + target.name, starter, chmod=O755)
-        self.create_task('manpyge', tgt = target.change_ext('.1'), env = env)
+        manpage = target.change_ext('.1')
+        self.create_task('manpyge', tgt = manpage, env = env)
+        self.create_task('gz', src = manpage, tgt = target.change_ext('.1.gz'), env = env)
