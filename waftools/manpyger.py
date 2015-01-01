@@ -18,6 +18,9 @@ class entrypynt(Task):
                 subst_vars("exec ${PYTHON} -m ${MODULE} $@", self.env))
         starter.chmod(O755)
 
+class manpyge(Task):
+    run_str = "PYTHONPATH=${gen.path.abspath()}: ${PYTHON} -Bm manpager ${MODULE} > ${TGT}"
+
 @feature('entrypynt')
 def generate_python_starter(self):
     for module, target in zip(to_list(self.modules),
@@ -27,3 +30,4 @@ def generate_python_starter(self):
         starter = target.change_ext('.sh')
         self.create_task('entrypynt', tgt = starter, env = env)
         self.bld.install_as(subst_vars("${BINDIR}/", self.env) + target.name, starter, chmod=O755)
+        self.create_task('manpyge', tgt = target.change_ext('.1'), env = env)
