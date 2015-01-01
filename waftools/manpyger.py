@@ -21,6 +21,12 @@ class entrypynt(Task):
 class manpyge(Task):
     run_str = "PYTHONPATH=${gen.path.abspath()}: ${PYTHON} -Bm manpager ${MODULE} > ${TGT}"
 
+    def keyword(self):
+        return "Documenting module"
+
+    def __str__(self):
+        return self.env.MODULE
+
 @feature('entrypynt')
 def generate_python_starter(self):
     for module, target in zip(to_list(self.modules),
