@@ -14,4 +14,4 @@ def configure(ctx):
 
 def build(ctx):
     ctx(features="py", source=ctx.path.find_dir("manpager").ant_glob("**/*.py"))
-    ctx(features="entrypynt", modules="manpager", target="manpager.sh")
+    ctx(features="entrypynt", modules="manpager")

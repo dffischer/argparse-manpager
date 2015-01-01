@@ -53,8 +53,10 @@ class manpyge(Task):
 
 @feature('entrypynt')
 def generate_python_starter(self):
-    for module, target in zip(to_list(self.modules),
-            map(self.path.find_or_declare, to_list(self.target))):
+    modules = to_list(self.modules)
+    for module, target in zip(modules, map(self.path.find_or_declare,
+        to_list(self.target) if self.target else (
+            module.replace(".", "-") for module in modules))):
         env = self.env.derive()
         env.MODULE = module
         starter = target.change_ext('.sh')
