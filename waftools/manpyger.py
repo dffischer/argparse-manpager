@@ -3,10 +3,10 @@ from waflib.TaskGen import feature
 from waflib.Utils import O755, subst_vars, to_list
 
 def options(ctx):
-    ctx.load('python')
+    ctx.load('python gnu_dirs')
 
 def configure(ctx):
-    ctx.load('python')
+    ctx.load('python gnu_dirs')
     ctx.check_python_module('manpager')
 
 class entrypynt(Task):
@@ -24,4 +24,6 @@ def generate_python_starter(self):
             map(self.path.find_or_declare, to_list(self.target))):
         env = self.env.derive()
         env.MODULE = module
-        self.create_task('entrypynt', tgt = target.change_ext('.sh'), env = env)
+        starter = target.change_ext('.sh')
+        self.create_task('entrypynt', tgt = starter, env = env)
+        self.bld.install_as(subst_vars("${BINDIR}/", self.env) + target.name, starter, chmod=O755)
