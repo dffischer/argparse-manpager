@@ -1,5 +1,10 @@
 #! /usr/bin/env python
 
+# The next two lines enable the use of the manpyger waftool before installing it. When you
+# use the tool in your own projects and argparse-mapager is installed, you do not need them.
+from sys import path
+path.append("waftools")
+
 def options(ctx):
     ctx.load('manpyger')
 
