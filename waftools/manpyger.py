@@ -61,12 +61,15 @@ class gz(Task):
 @feature('entrypynt')
 def generate_python_starter(self):
     env = self.env
+    def flag(*args):
+        env.append_value("MANPAGERFLAGS", args)
     for parameter in 'short', 'suite', 'program':
         value = getattr(self, parameter, None)
         if value:
-            env.append_value("MANPAGERFLAGS", ("--" + parameter, '"' + value + '"'))
+            flag("--" + parameter, '"' + value + '"')
     for title, content in getattr(self, 'extra', {}).items():
-        env.append_value("MANPAGERFLAGS", ("-e '{} {}'".format(title.upper(), content)))
+        flag("-e", "'{} {}'".format(title.upper(), content))
+
     modules = to_list(self.modules)
     for module, target in zip(modules, map(self.path.find_or_declare,
         to_list(self.target) if self.target else (
