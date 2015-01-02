@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+# encoding: utf-8
+# Dominik Fischer, 2014-2015 (XZS)
+
 from waflib.Task import Task
 from waflib.TaskGen import feature
 from waflib.Utils import O755, subst_vars, to_list
