@@ -16,7 +16,7 @@ def configure(ctx):
 
 def build(ctx):
     ctx(features="py", source=ctx.path.find_dir("manpager").ant_glob("**/*.py"))
-    ctx(features="entrypynt", modules="manpager", program="manpager", suite="argparse-manpager",
+    ctx(features="entrypynt", modules="manpager", suite="argparse-manpager",
             short="generate manual pages for python modules using argparse""",
             extra=OrderedDict((
                 ('SEE ALSO', '.BI pydoc \ argparse'),

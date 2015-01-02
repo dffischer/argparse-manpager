@@ -63,7 +63,7 @@ def generate_python_starter(self):
     env = self.env
     def flag(*args):
         env.append_value("MANPAGERFLAGS", args)
-    for parameter in 'short', 'suite', 'program':
+    for parameter in 'short', 'suite':
         value = getattr(self, parameter, None)
         if value:
             flag("--" + parameter, '"' + value + '"')
@@ -76,6 +76,7 @@ def generate_python_starter(self):
             module.replace(".", "-") for module in modules))):
         modenv = env.derive()
         modenv.MODULE = module
+        modenv.append_value("MANPAGERFLAGS", ('-p', target.name))
         def create_task(*args, **kwargs):
             self.create_task(*args, env = modenv, **kwargs)
         starter = target.change_ext('.sh')
