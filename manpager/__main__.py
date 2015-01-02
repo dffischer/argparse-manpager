@@ -6,7 +6,8 @@ from re import compile, DOTALL
 
 # Do not modify ArgumentParser yet. First, it is needed proper for this program itself.
 
-parser = ArgumentParser(description="Generates a manpage from an argparse help text")
+parser = ArgumentParser(description="Generates a manpage from an argparse help text.")
+parser.short = __doc__
 parser.add_argument('module', help="module to generate manpage for")
 parser.add_argument('-d', '--short', metavar="DESCRIPTION", help="""
         Specifies a short description to add in the NAME section. This can also be set
