@@ -1,6 +1,7 @@
 from waflib.Task import Task
 from waflib.TaskGen import feature
 from waflib.Utils import O755, subst_vars, to_list
+from waflib.Context import g_module, APPNAME
 from re import compile, MULTILINE
 
 def options(ctx):
@@ -63,10 +64,12 @@ def generate_python_starter(self):
     env = self.env
     def flag(*args):
         env.append_value("MANPAGERFLAGS", args)
-    for parameter in 'short', 'suite':
-        value = getattr(self, parameter, None)
-        if value:
-            flag("--" + parameter, '"' + value + '"')
+    short_desc = getattr(self, 'short', None)
+    if short_desc:
+        flag("-d", "'{}'".format(short_desc))
+    appname = getattr(g_module, APPNAME, None)
+    if appname:
+        flag("-s", "'{}'".format(appname))
     for title, content in getattr(self, 'extra', {}).items():
         flag("-e", "'{} {}'".format(title.upper(), content))
 
