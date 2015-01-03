@@ -7,6 +7,7 @@ from waflib.TaskGen import feature
 from waflib.Utils import O755, subst_vars, to_list
 from waflib.Context import g_module, APPNAME
 from re import compile, MULTILINE
+from itertools import chain
 
 def options(ctx):
     ctx.load('python gnu_dirs')
@@ -78,9 +79,9 @@ def generate_python_starter(self):
         flag("-e", "'{} {}'".format(title.upper(), content))
 
     modules = to_list(self.modules)
-    for module, target in zip(modules, map(self.path.find_or_declare,
-        to_list(self.target) if self.target else (
-            module.replace(".", "-") for module in modules))):
+    targets = to_list(self.target)
+    for module, target in zip(modules, map(self.path.find_or_declare, chain(
+        targets, (module.replace(".", "-") for module in modules[len(targets):])))):
         modenv = env.derive()
         modenv.MODULE = module
         modenv.append_value("MANPAGERFLAGS", ('-p', target.name))
