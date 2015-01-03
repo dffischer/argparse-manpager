@@ -18,7 +18,7 @@ def configure(ctx):
 
 def build(ctx):
     ctx(features="py", source=ctx.path.find_dir("manpager").ant_glob("**/*.py"))
-    ctx(features="entrypynt", modules="manpager",
+    ctx(features="entrypynt", starter="manpager",
             extra=OrderedDict((
                 ('SEE ALSO', '.BI pydoc \ argparse'),
                 ('AUTHORS', """The manpager was initially developed by XZS <d.f.fischer@web.de>.

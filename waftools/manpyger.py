@@ -78,7 +78,7 @@ def generate_python_starter(self):
     for title, content in getattr(self, 'extra', {}).items():
         flag("-e", "'{} {}'".format(title.upper(), content))
 
-    modules = to_list(self.modules)
+    modules = to_list(self.starter)
     targets = to_list(self.target)
     for module, target in zip(modules, map(self.path.find_or_declare, chain(
         targets, (module.replace(".", "-") for module in modules[len(targets):])))):
