@@ -3,11 +3,13 @@
 # Dominik Fischer, 2014-2015 (XZS)
 
 from waflib.Task import Task
-from waflib.TaskGen import feature
+from waflib.TaskGen import feature, after_method
 from waflib.Utils import O755, subst_vars, to_list
 from waflib.Context import g_module, APPNAME
+from waflib.Tools.python import feature_py
 from re import compile, MULTILINE
 from itertools import chain
+
 
 def options(ctx):
     ctx.load('python gnu_dirs')
@@ -40,7 +42,7 @@ class manpyge(Task):
 
     def scan(self, imp=compile("^from (\..+) import .+$|^import (\..+)$", MULTILINE)):
         """find local imports recursively"""
-        module = find_py(self.generator.path, self.env.MODULE, "__main__")
+        module = find_py(self.generator.install_from, self.env.MODULE, "__main__")
         unseen = {module}
         seen = set()
         while unseen:
@@ -64,7 +66,12 @@ class gz(Task):
     def keyword(self):
         return "Compressing"
 
+
+feature('entrypynt')(feature_py)
+# This makes sure install_from is either None or a Node which generate_python_starter relies upon.
+
 @feature('entrypynt')
+@after_method('feature_py')
 def generate_python_starter(self):
     env = self.env
     def flag(*args):
@@ -78,7 +85,10 @@ def generate_python_starter(self):
     for title, content in getattr(self, 'extra', {}).items():
         flag("-e", "'{} {}'".format(title.upper(), content))
 
-    path = self.path
+    if self.install_from:
+        path = self.install_from
+    else:
+        path = self.install_from = self.path
     env.env = {"PYTHONPATH": path.bldpath() + ":" + path.srcpath() + ":"}
 
     modules = to_list(self.starter)
