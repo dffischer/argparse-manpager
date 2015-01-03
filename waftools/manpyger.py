@@ -35,8 +35,8 @@ def find_py(location, module, entry="__init__"):
         return location.find_node(module + ".py")
 
 class manpyge(Task):
-    run_str = "PYTHONPATH=${gen.path.abspath()}: ${PYTHON} " \
-        "-Bm manpager ${MANPAGERFLAGS} ${MODULE} > ${TGT}"
+    vars = ['env']  # This contains the PYTHONPATH which may cause a whole different module.
+    run_str = "${PYTHON} -Bm manpager ${MANPAGERFLAGS} ${MODULE} > ${TGT}"
 
     def scan(self, imp=compile("^from (\..+) import .+$|^import (\..+)$", MULTILINE)):
         """find local imports recursively"""
@@ -78,9 +78,12 @@ def generate_python_starter(self):
     for title, content in getattr(self, 'extra', {}).items():
         flag("-e", "'{} {}'".format(title.upper(), content))
 
+    path = self.path
+    env.env = {"PYTHONPATH": path.bldpath() + ":" + path.srcpath() + ":"}
+
     modules = to_list(self.starter)
     targets = to_list(self.target)
-    for module, target in zip(modules, map(self.path.find_or_declare, chain(
+    for module, target in zip(modules, map(path.find_or_declare, chain(
         targets, (module.replace(".", "-") for module in modules[len(targets):])))):
         modenv = env.derive()
         modenv.MODULE = module
