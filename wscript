@@ -17,7 +17,7 @@ def configure(ctx):
     ctx.check_python_version()
 
 def build(ctx):
-    ctx(features="py", source=ctx.path.find_dir("manpager").ant_glob("**/*.py"))
+    ctx(features="py", root="manpager")
     ctx(features="entrypynt", starter="manpager",
             extra=OrderedDict((
                 ('SEE ALSO', '.BI pydoc \ argparse'),

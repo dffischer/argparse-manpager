@@ -127,3 +127,10 @@ def split_root(self):
         for root in self.to_nodes(roots, self.install_from, "find_dir"):
             self.bld(features = self.features, parent = self,
                     install_from = root.parent, root = root)
+
+@feature("py")
+@before_method("process_source")
+def find_sources(self):
+    parent = getattr(self, "parent", None)
+    if parent:
+        self.source = self.root.ant_glob("**/*.py")
