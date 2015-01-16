@@ -3,9 +3,10 @@
 # Dominik Fischer, 2014-2015 (XZS)
 
 from waflib.Task import Task
-from waflib.TaskGen import feature, after_method
+from waflib.TaskGen import feature, before_method, after_method, taskgen_method
 from waflib.Utils import O755, subst_vars, to_list
 from waflib.Context import g_module, APPNAME
+from waflib.Node import Node
 from waflib.Tools.python import feature_py
 from re import compile, MULTILINE
 from itertools import chain
@@ -108,3 +109,21 @@ def generate_python_starter(self):
         compressed = target.change_ext('.1.gz')
         create_task('gz', src = manpage, tgt = compressed)
         self.bld.install_files(subst_vars("${MANDIR}/man1", env), compressed)
+
+
+@taskgen_method
+def to_nodes(self, lst, path=None, search_fun="find_resource"):
+    """This is exactly to_nodes, but finding directories without generating exceptions."""
+    search_fun = getattr(path or self.path, search_fun)
+    return [search_fun(dir) if isinstance(dir, str) else dir
+            for dir in to_list([lst] if isinstance(lst, Node) else lst)]
+
+@feature("py", "entrypynt")
+@after_method("feature_py")
+def split_root(self):
+    roots = getattr(self, "root", None)
+    if roots and not hasattr(self, "parent"):
+        del(self.root)
+        for root in self.to_nodes(roots, self.install_from, "find_dir"):
+            self.bld(features = self.features, parent = self,
+                    install_from = root.parent, root = root)
