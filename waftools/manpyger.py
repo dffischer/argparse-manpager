@@ -134,3 +134,22 @@ def find_sources(self):
     parent = getattr(self, "parent", None)
     if parent:
         self.source = self.root.ant_glob("**/*.py")
+
+def pop(lst, start, count):
+    """Remove and return a slice from a list."""
+    end = start + count
+    result = lst[start:end]
+    del(lst[start:end])
+    return result
+
+@feature("entrypynt")
+@after_method("feature_py")
+@before_method("generate_python_starter")
+def compose_starters(self):
+    parent = getattr(self, "parent", None)
+    if parent:
+        mains = getattr(self.parent, "main", None)
+        if mains:
+            self.starter = [self.root.name + "." + main for main in to_list(mains)]
+    else:
+        self.main = to_list(getattr(self, "main", ()))
