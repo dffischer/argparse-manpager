@@ -93,9 +93,8 @@ def generate_python_starter(self):
     env.env = {"PYTHONPATH": path.bldpath() + ":" + path.srcpath() + ":"}
 
     modules = to_list(getattr(self, "starter", []))
-    targets = to_list(self.target)
-    for module, target in zip(modules, map(path.find_or_declare, chain(
-        targets, (module.replace(".", "-") for module in modules[len(targets):])))):
+    for module, target in zip(modules, chain(self.target, map(path.find_or_declare,
+        (module.replace(".", "-") for module in modules[len(self.target):])))):
         modenv = env.derive()
         modenv.MODULE = module
         modenv.append_value("MANPAGERFLAGS", ('-p', target.name))
@@ -151,5 +150,9 @@ def compose_starters(self):
         mains = getattr(self.parent, "main", None)
         if mains:
             self.starter = [self.root.name + "." + main for main in to_list(mains)]
+            self.target = pop(parent.target,
+                    len(getattr(parent, "starter", ())), len(mains))
     else:
+        self.target = self.to_nodes(getattr(self, "target", ()),
+                self.install_from, "find_or_declare")
         self.main = to_list(getattr(self, "main", ()))
