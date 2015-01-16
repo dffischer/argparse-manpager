@@ -92,7 +92,7 @@ def generate_python_starter(self):
         path = self.install_from = self.path
     env.env = {"PYTHONPATH": path.bldpath() + ":" + path.srcpath() + ":"}
 
-    modules = to_list(self.starter)
+    modules = to_list(getattr(self, "starter", []))
     targets = to_list(self.target)
     for module, target in zip(modules, map(path.find_or_declare, chain(
         targets, (module.replace(".", "-") for module in modules[len(targets):])))):
