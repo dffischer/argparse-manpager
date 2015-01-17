@@ -17,8 +17,7 @@ def configure(ctx):
     ctx.check_python_version()
 
 def build(ctx):
-    ctx(features="py", root="manpager")
-    ctx(features="entrypynt", starter="manpager",
+    ctx(features="py entrypynt", root="manpager",
             extra=OrderedDict((
                 ('SEE ALSO', '.BI pydoc \ argparse'),
                 ('AUTHORS', """The manpager was initially developed by XZS <d.f.fischer@web.de>.

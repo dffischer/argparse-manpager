@@ -144,7 +144,8 @@ def pop(lst, start, count):
 @feature("entrypynt")
 @after_method("feature_py")
 @before_method("generate_python_starter")
-def compose_starters(self):
+def compose_starters(self,
+        main_indicator=compile('__name__ == (?P<quote>["\'])__main__(?P=quote)')):
     parent = getattr(self, "parent", None)
     if parent:
         mains = getattr(self.parent, "main", None)
@@ -152,6 +153,16 @@ def compose_starters(self):
             self.starter = [self.root.name + "." + main for main in to_list(mains)]
             self.target = pop(parent.target,
                     len(getattr(parent, "starter", ())), len(mains))
+        elif not hasattr(self.parent, 'starter'):
+            root = self.root
+            base = root.parent
+            def starter_path(node):
+                if node.name == "__main__.py":
+                    return node.parent.path_from(base)
+                elif main_indicator.search(node.read()):
+                    return node.path_from(base)[:-3]
+            self.starter = [starter.replace("/", ".") for starter in
+                    map(starter_path, root.ant_glob("**/*.py")) if starter]
     else:
         self.target = self.to_nodes(getattr(self, "target", ()),
                 self.install_from, "find_or_declare")
