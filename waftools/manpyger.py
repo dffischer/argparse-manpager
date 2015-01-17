@@ -68,11 +68,11 @@ class gz(Task):
         return "Compressing"
 
 
-feature('entrypynt')(feature_py)
+feature("entrypynt")(feature_py)
 # This makes sure install_from is either None or a Node which generate_python_starter relies upon.
 
-@feature('entrypynt')
-@after_method('feature_py')
+@feature("entrypynt")
+@after_method("feature_py")
 def generate_python_starter(self):
     env = self.env
     def flag(*args):
