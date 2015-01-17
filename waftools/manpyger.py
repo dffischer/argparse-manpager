@@ -73,27 +73,35 @@ feature("entrypynt")(feature_py)
 
 @feature("entrypynt")
 @after_method("feature_py")
+def compose_environment(self):
+    parent = getattr(self, 'parent', None)
+    if parent:
+        self.env = parent.env
+    else:
+        env = self.env
+        def flag(*args):
+            env.append_value("MANPAGERFLAGS", args)
+        short_desc = getattr(self, 'short', None)
+        if short_desc:
+            flag("-d", "'{}'".format(short_desc))
+        appname = getattr(g_module, APPNAME, None)
+        if appname:
+            flag("-s", "'{}'".format(appname))
+        for title, content in getattr(self, 'extra', {}).items():
+            flag("-e", "'{} {}'".format(title.upper(), content))
+
+        if self.install_from:
+            path = self.install_from
+        else:
+            path = self.install_from = self.path
+        env.env = {"PYTHONPATH": path.bldpath() + ":" + path.srcpath() + ":"}
+
+@feature("entrypynt")
+@after_method("compose_environment")
 def generate_python_starter(self):
     env = self.env
-    def flag(*args):
-        env.append_value("MANPAGERFLAGS", args)
-    short_desc = getattr(self, 'short', None)
-    if short_desc:
-        flag("-d", "'{}'".format(short_desc))
-    appname = getattr(g_module, APPNAME, None)
-    if appname:
-        flag("-s", "'{}'".format(appname))
-    for title, content in getattr(self, 'extra', {}).items():
-        flag("-e", "'{} {}'".format(title.upper(), content))
-
-    if self.install_from:
-        path = self.install_from
-    else:
-        path = self.install_from = self.path
-    env.env = {"PYTHONPATH": path.bldpath() + ":" + path.srcpath() + ":"}
-
     modules = to_list(getattr(self, "starter", []))
-    for module, target in zip(modules, chain(self.target, map(path.find_or_declare,
+    for module, target in zip(modules, chain(self.target, map(self.install_from.find_or_declare,
         (module.replace(".", "-") for module in modules[len(self.target):])))):
         modenv = env.derive()
         modenv.MODULE = module
