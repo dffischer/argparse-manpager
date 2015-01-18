@@ -52,6 +52,17 @@ Both features can be conveniently combined to install an executable module in on
     bld(feature="py entrypynt", root=bld.path.ant_glob("package_*"))
     Install all packages found in the build path and add starters
     and manual pages for all executable modules found therein.
+
+
+When generating a manual page, the tool tries to find all dependencies
+by recursively scanning the given modules source for import statements.
+The regular expression used to find these can be changed by assigning a
+new pattern object (created by re.compile) to the attribute "import_statement"
+of this module. It should be compiled with the MULTILINE flag and assign
+the name of the module imported to a group named "module". By default,
+instances of "from module import anything" and "import module" are found.
+
+You may set it to an invalid pattern, like "$^", to turn off recursive scanning.
 """
 
 from waflib.Task import Task
@@ -89,6 +100,9 @@ def find_py(location, module, entry="__init__"):
     else:
         return location.find_node(module + ".py")
 
+import_statement = compile("^(import|(?P<from>from)) (?P<module>\..+)(?(from) import .+)$",
+        MULTILINE)
+
 class manpyge(Task):
     vars = ['env']  # This contains the PYTHONPATH which may cause a whole different module.
     # It can only be conveniently hashed like this because it contains only this
@@ -97,7 +111,7 @@ class manpyge(Task):
 
     run_str = "${PYTHON} -Bm manpager ${MANPAGERFLAGS} ${MODULE} > ${TGT}"
 
-    def scan(self, imp=compile("^from (\..+) import .+$|^import (\..+)$", MULTILINE)):
+    def scan(self):
         """find local imports recursively"""
         module = find_py(self.generator.install_from, self.env.MODULE, "__main__")
         unseen = {module}
@@ -105,8 +119,8 @@ class manpyge(Task):
         while unseen:
             module = unseen.pop()
             seen.add(module)
-            for match in imp.finditer(module.read()):
-                next = find_py(module.parent, match.group(1)[1:])
+            for match in import_statement.finditer(module.read()):
+                next = find_py(module.parent, match.group("module")[1:])
                 if next not in seen:
                     unseen.add(next)
         return seen, None
