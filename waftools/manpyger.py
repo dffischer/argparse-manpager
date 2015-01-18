@@ -2,6 +2,58 @@
 # encoding: utf-8
 # Dominik Fischer, 2014-2015 (XZS)
 
+"""
+Support for Python modules and automatic manual page generation,
+
+Loading this tool pulls in python and gnu_dirs. Note that you most probably have to call
+check_python_version on the configuration context in order for any of the features herein to work.
+
+
+Use the feature "py" to install python files, specified as sources, and
+whole modules, specified as roots. If these are not found in the current
+build path, it can be overwritten using the "install_from" parameter.
+
+    bld(feature="py", install_from="src",
+        root="package_one package_two", source="additional_file.py")
+    Install the packages one and two and the additional_file, found in the src directory.
+
+
+The feature "entrypynt" installs starters for python files and manual pages generated
+from their argparse help text. Specify modules directly in the parameter "starter".
+
+    bld(feature="entrypynt", starter="http.server compileall")
+    Make some built-in python modules easily accessible as executable programs.
+
+The parameter "main" instead generates a starter below each package given as "root".
+
+    bld(feature="entrypynt", install_from="src",
+        root="stable staging/experiment", main="main test")
+    Generate starters and manual pages for stable.main, stable.test, found in a package located
+    at src/stable, as well as experiment.main and experiment.test from src/staging/experiment.
+
+When only roots are given, they are automatically scanned for
+executable modules to generate starters and manual pages for.
+
+    bld(feature="entrypynt", root=bld.path.ant_glob("package_*"))
+    Find executable modules in all packages directly below the build path.
+
+The short program description used in the manual page and by apropos can be overwritten
+with the "short" parameter. Sections can be added using the "extra" parameter. Using an
+OrderedDict for the latter is highly recommended to keep them from mixing up their order.
+
+    bld(features="entrypynt", starter="nothing", short="does nothing",
+            extra=OrderedDict((
+                ('SEE ALSO', '.BR yes, echo'),
+                ('BUGS', "The program should perhaps do something"))))
+
+
+Both features can be conveniently combined to install an executable module in one line.
+
+    bld(feature="py entrypynt", root=bld.path.ant_glob("package_*"))
+    Install all packages found in the build path and add starters
+    and manual pages for all executable modules found therein.
+"""
+
 from waflib.Task import Task
 from waflib.TaskGen import feature, before_method, after_method, taskgen_method
 from waflib.Utils import O755, subst_vars, to_list
