@@ -39,6 +39,10 @@ def find_py(location, module, entry="__init__"):
 
 class manpyge(Task):
     vars = ['env']  # This contains the PYTHONPATH which may cause a whole different module.
+    # It can only be conveniently hashed like this because it contains only this
+    # one element. Would it contain more, the unspecified order in a dictionary
+    # could generate a different hash also when the elements do not change.
+
     run_str = "${PYTHON} -Bm manpager ${MANPAGERFLAGS} ${MODULE} > ${TGT}"
 
     def scan(self, imp=compile("^from (\..+) import .+$|^import (\..+)$", MULTILINE)):
