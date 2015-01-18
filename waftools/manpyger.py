@@ -37,6 +37,12 @@ executable modules to generate starters and manual pages for.
     bld(feature="entrypynt", root=bld.path.ant_glob("package_*"))
     Find executable modules in all packages directly below the build path.
 
+When automatically scanning for executable modules, each directory containing a file
+named "__main__.py" is considered a match as well as every file that contains the
+string "__name__ == '__main__'" specified with either double or single quotes. The
+latter string identifying executable modules may be changed by assigning a pattern
+object (as created by re.compile) to the attribute "main_indicator" of this module.
+
 The short program description used in the manual page and by apropos can be overwritten
 with the "short" parameter. Sections can be added using the "extra" parameter. Using an
 OrderedDict for the latter is highly recommended to keep them from mixing up their order.
@@ -219,11 +225,12 @@ def pop(lst, start, count):
     del(lst[start:end])
     return result
 
+main_indicator = compile('__name__ == (?P<quote>["\'])__main__(?P=quote)')
+
 @feature("entrypynt")
 @after_method("feature_py")
 @before_method("generate_python_starter")
-def compose_starters(self,
-        main_indicator=compile('__name__ == (?P<quote>["\'])__main__(?P=quote)')):
+def compose_starters(self):
     parent = getattr(self, "parent", None)
     if parent:
         mains = getattr(self.parent, "main", None)
