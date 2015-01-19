@@ -8,6 +8,8 @@ path.append("waftools")
 APPNAME = "argparse-manpager"
 
 from collections import OrderedDict
+from waflib.Context import waf_dir
+from waflib.Utils import subst_vars
 
 def options(ctx):
     ctx.load('manpyger')
@@ -23,3 +25,5 @@ def build(ctx):
                 ('AUTHORS', """The manpager was initially developed by XZS <d.f.fischer@web.de>.
 
                 The code lives on github <http://github.com/dffischer/argparse-manpager>."""))))
+    ctx.install_files(''.join((subst_vars("${LIBDIR}/", ctx.env),
+        waf_dir.rpartition('/')[2], "/waflib/extras")), 'waftools/manpyger.py')
