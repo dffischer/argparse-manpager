@@ -66,5 +66,5 @@ class TH(SectionContainer):
     subtype = SH
     @staticmethod
     def header(title):
-        return '.TH {prog} 1 {date} "" "General Commands Manual"'.format(
+        return '.TH "{prog}" 1 {date} "" "General Commands Manual"'.format(
                 prog=title, date=date.today().isoformat())
