@@ -79,6 +79,7 @@ from waflib.Node import Node
 from waflib.Tools.python import feature_py
 from re import compile, MULTILINE
 from itertools import chain
+from operator import methodcaller
 
 
 def options(ctx):
@@ -129,7 +130,7 @@ class manpyge(Task):
                 next = find_py(module.parent, match.group("module")[1:])
                 if next not in seen:
                     unseen.add(next)
-        return seen, None
+        return sorted(seen, key=methodcaller('srcpath')), None
 
     def keyword(self):
         return "Documenting module"
