@@ -1,2 +1,6 @@
 __pycache__
 .lock-*
+*/
+!manpager/
+!waftools/
+*.pkg.tar.xz
