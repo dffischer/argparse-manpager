@@ -4,7 +4,7 @@ Generate manual pages from executable python modules using argparse.
 
 ## Installation
 
-Archlinux users have [a package in the AUR](https://aur.archlinux.org/packages/python-argparse-manpager-git/).
+Archlinux users have [a package in the AUR](https://aur.archlinux.org/packages/python-argparse-manpager-git/). To use the [PKGBUILD](PKGBUILD) as it is kept in this repository, [the makepkg-template for git](https://github.com/dffischer/git-makepkg-template) has to be installed.
 
 This project uses [waf](https://code.google.com/p/waf/) to compile and install. If you already have waf installed with your distribution, you can just `waf configure install`. If you do not have waf installed, execute
 

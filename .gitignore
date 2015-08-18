@@ -4,3 +4,5 @@ __pycache__
 !manpager/
 !waftools/
 *.pkg.tar.xz
+*.expanded
+.SRCINFO

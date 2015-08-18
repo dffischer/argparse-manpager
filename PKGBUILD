@@ -9,15 +9,15 @@ license=('GPL3')
 depends=('python')
 makedepends=('waf')
 optdepends=('waf: to use the corresponding waf tool')
-source=("$pkgname::git://github.com/dffischer/argparse-manpager.git")
-md5sums=('SKIP')
+
+# template input; name=git
 
 build() {
-	cd "$srcdir/$pkgname"
+	cd "$_gitname"
 	waf --prefix=/usr configure build
 }
 
 package() {
-	cd "$srcdir/$pkgname"
+	cd "$_gitname"
 	waf install --destdir="$pkgdir/"
 }
