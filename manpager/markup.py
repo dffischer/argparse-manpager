@@ -96,5 +96,5 @@ class Sanitizer(MultiRegexReplacer):
         super().__init__(OrderedDict((
             ('-', '\\-'),
             ('\n\n+', paragraph),
-            ('^\s+|\s+$', ''),
-            ('\s\s+', ' '))))
+            ('^\\s+|\\s+$', ''),
+            ('\\s\\s+', ' '))))

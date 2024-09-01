@@ -37,7 +37,7 @@ class ManPage(TH):
         super().__init__(suite if suite else prog, name, synopsis, description, options, remarks,
                 *(SH(title) << sanitize(content) for title, content in extrasections.items()))
         if short_desc:
-            name << "\-" << short_desc
+            name << "\\-" << short_desc
         self.options = options
         self.next_section = iter((synopsis, description, remarks)).__next__
 

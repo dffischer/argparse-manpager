@@ -21,7 +21,7 @@ def configure(ctx):
 def build(ctx):
     ctx(features="py entrypynt", root="manpager", starter="manpager",
             extra=OrderedDict((
-                ('SEE ALSO', '.BI pydoc \ argparse'),
+                ('SEE ALSO', '.BI pydoc \\ argparse'),
                 ('AUTHORS', """The manpager was initially developed by XZS <d.f.fischer@web.de>.
 
                 The code lives on github <http://github.com/dffischer/argparse-manpager>."""))))
