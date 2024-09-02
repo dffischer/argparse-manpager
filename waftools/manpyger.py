@@ -184,7 +184,7 @@ def generate_python_starter(self):
         modenv.MODULE = module
         modenv.append_value("MANPAGERFLAGS", ('-p', target.name))
         def create_task(*args, **kwargs):
-            self.create_task(*args, env = modenv, **kwargs)
+            self.create_task(*args, **kwargs).env = modenv
         starter = target.change_ext('.sh')
         create_task('entrypynt', tgt = starter)
         self.bld.install_as(subst_vars("${BINDIR}/", env) + target.name, starter, chmod=O755)
