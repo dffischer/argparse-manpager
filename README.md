@@ -9,7 +9,7 @@ Archlinux users have [a package in the AUR](https://aur.archlinux.org/packages/p
 This project uses [waf](https://code.google.com/p/waf/) to compile and install. If you already have waf installed with your distribution, you can just `waf configure install`. If you do not have waf installed, execute
 
 ```bash
-wget -O waf http://ftp.waf.io/pub/release/waf-1.8.6
+wget -O waf https://waf.io/waf-2.1.2
 chmod 755 waf
 ./waf configure install
 ```
